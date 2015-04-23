@@ -6,7 +6,7 @@
 * //2. 200 으로 초기화
 * //3. 마우스 클릭으로 증가 / 감소
 * //4. 100~ 300 사이
-* 5. 포커스 아웃시 숫자 외에는 다 날리기
+* //5. 포커스 아웃시 숫자 외에는 다 날리기
 * 6. 누르고 0.5초 이후론 0.1초마다 1씩 증감되도록 */
 
 function Spinbox(val){
@@ -16,8 +16,7 @@ function Spinbox(val){
     this.dnEl = document.getElementById('btn_dn');
 
     this.setValue(this.nFirstData);
-    this.eventup();
-    this.eventdn();
+    this.event();
     this.inputBlur();
 }
 
@@ -34,32 +33,43 @@ Spinbox.prototype = {
     },
     minChecker:function(){
         var that = this;
-        if (that.inputEl.value > this.nMinData) {
-            return true
-        } else {
-            return false
-        };
+        return (that.inputEl.value > this.nMinData);
     },
-    eventup:function(){
+    event:function(){
         var that = this;
-        this.upEl.addEventListener('click',function(){
-            var nNumber = parseInt(that.inputEl.value);
-            if (that.maxChecker()){that.inputEl.value = nNumber+1};
+        this.upEl.addEventListener('mousedown',function(){
+            setTimeout(function(){
+                that.acel = setInterval(function(){
+                    var nNumber = parseInt(that.inputEl.value);
+                    if (that.maxChecker()){that.inputEl.value = nNumber+1}
+                },100)
+            },500);
         });
-    },
-    eventdn:function(){
-        var that = this;
-        this.dnEl.addEventListener('click',function(){
-            var nNumber = parseInt(that.inputEl.value);
-            if (that.minChecker()){that.inputEl.value = nNumber-1};
+        this.upEl.addEventListener('mouseup', function(){
+            clearInterval(that.acel);
+        });
+        this.upEl.addEventListener('mouseout', function(){
+            clearInterval(that.acel);
+        });
+
+        this.dnEl.addEventListener('mousedown',function(){
+            that.acel = setInterval(function(){
+                var nNumber = parseInt(that.inputEl.value);
+                if (that.minChecker()){that.inputEl.value = nNumber-1}
+            },100);
+        });
+        this.dnEl.addEventListener('mouseup', function(){
+            clearInterval(that.acel);
+        });
+        this.dnEl.addEventListener('mouseout', function(){
+            clearInterval(that.acel);
         });
     },
     inputBlur:function(){
         var that = this;
         that.inputEl.addEventListener('blur',function(){
-           var nNumber = parseInt(that.inputEl.value);
-
+            var numcheck = /[^0-9-]/g;
+            that.inputEl.value = that.inputEl.value.replace(numcheck,"");
         });
-
     }
 };
