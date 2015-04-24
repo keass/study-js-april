@@ -7,7 +7,7 @@
 * //3. 마우스 클릭으로 증가 / 감소
 * //4. 100~ 300 사이
 * //5. 포커스 아웃시 숫자 외에는 다 날리기
-* 6. 누르고 0.5초 이후론 0.1초마다 1씩 증감되도록 */
+* //6. 누르고 0.5초 이후론 0.1초마다 1씩 증감되도록 */
 
 function Spinbox(val){
 
@@ -37,13 +37,23 @@ Spinbox.prototype = {
     },
     event:function(){
         var that = this;
+        var increase = function (){
+            var nNumber = parseInt(that.inputEl.value);
+            if (that.maxChecker()){that.inputEl.value = nNumber+1}
+        };
+        var decrease = function (){
+            var nNumber = parseInt(that.inputEl.value);
+            if (that.minChecker()){that.inputEl.value = nNumber-1}
+        };
+        var repeater = function(fnc,val){
+            if (!val) { val = 200;}
+            that.acel = setInterval(fnc,val);
+        };
         this.upEl.addEventListener('mousedown',function(){
-            setTimeout(function(){
-                that.acel = setInterval(function(){
-                    var nNumber = parseInt(that.inputEl.value);
-                    if (that.maxChecker()){that.inputEl.value = nNumber+1}
-                },100)
+            that.acel = setTimeout(function(){
+                repeater(increase,100);
             },500);
+            increase();
         });
         this.upEl.addEventListener('mouseup', function(){
             clearInterval(that.acel);
@@ -51,12 +61,11 @@ Spinbox.prototype = {
         this.upEl.addEventListener('mouseout', function(){
             clearInterval(that.acel);
         });
-
         this.dnEl.addEventListener('mousedown',function(){
-            that.acel = setInterval(function(){
-                var nNumber = parseInt(that.inputEl.value);
-                if (that.minChecker()){that.inputEl.value = nNumber-1}
-            },100);
+            that.acel = setTimeout(function(){
+                repeater(decrease,100);
+            },500);
+            decrease();
         });
         this.dnEl.addEventListener('mouseup', function(){
             clearInterval(that.acel);
